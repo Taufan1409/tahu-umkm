@@ -20,16 +20,21 @@ limbah = pd.read_csv("data_limbah.csv")
 # =========================
 # PERHITUNGAN DATA
 # =========================
-produksi["Waste"] = produksi["Produksi"] - produksi["Terjual"]
-produksi["Pendapatan"] = produksi["Terjual"] * produksi["Harga"]
+produksi["Waste"] = produksi["Produksi_kg"] * 0.1
 
-limbah["Pendapatan_Limbah"] = limbah["Dijual_kg"] * limbah["Harga_kg"]
-limbah["Sisa_Limbah"] = limbah["Ampas_kg"] - limbah["Dijual_kg"]
+limbah["Pendapatan_Limbah"] = (
+    limbah["Dijual_kg"] * limbah["Harga_kg"]
+)
+
+limbah["Sisa_Limbah"] = (
+    limbah["Ampas_kg"] - limbah["Dijual_kg"]
+)
 
 # =========================
 # SIDEBAR
 # =========================
 st.sidebar.title("Menu")
+
 menu = st.sidebar.radio(
     "Pilih Halaman",
     [
@@ -47,7 +52,9 @@ if menu == "Beranda":
 
     st.title("🟨 UMKM Tahu Sumedang")
 
-    st.subheader("Cita Rasa Tradisional dengan Sentuhan Modern")
+    st.subheader(
+        "Cita Rasa Tradisional dengan Sentuhan Modern"
+    )
 
     st.write(
         """
@@ -59,13 +66,24 @@ if menu == "Beranda":
 
     col1, col2, col3 = st.columns(3)
 
-    total_produksi = produksi["Produksi"].sum()
-    total_terjual = produksi["Terjual"].sum()
+    total_produksi = produksi["Produksi_kg"].sum()
+    total_waste = produksi["Waste"].sum()
     total_limbah = limbah["Pendapatan_Limbah"].sum()
 
-    col1.metric("Total Produksi", f"{total_produksi} pcs")
-    col2.metric("Total Terjual", f"{total_terjual} pcs")
-    col3.metric("Profit Limbah", f"Rp {total_limbah:,.0f}")
+    col1.metric(
+        "Total Produksi",
+        f"{total_produksi} Kg"
+    )
+
+    col2.metric(
+        "Total Waste",
+        f"{total_waste:.1f} Kg"
+    )
+
+    col3.metric(
+        "Profit Limbah",
+        f"Rp {total_limbah:,.0f}"
+    )
 
 # =========================
 # DASHBOARD PRODUKSI
@@ -76,26 +94,19 @@ elif menu == "Dashboard Produksi":
 
     st.dataframe(produksi)
 
-    st.subheader("Grafik Produksi vs Penjualan")
+    st.subheader("Grafik Produksi")
 
-    fig, ax = plt.subplots(figsize=(10,5))
+    fig, ax = plt.subplots(figsize=(10, 5))
 
     ax.plot(
-        produksi["Tanggal"],
-        produksi["Produksi"],
+        produksi["Hari"],
+        produksi["Produksi_kg"],
         marker='o',
         label='Produksi'
     )
 
-    ax.plot(
-        produksi["Tanggal"],
-        produksi["Terjual"],
-        marker='o',
-        label='Terjual'
-    )
-
-    ax.set_xlabel("Tanggal")
-    ax.set_ylabel("Jumlah")
+    ax.set_xlabel("Hari")
+    ax.set_ylabel("Produksi (Kg)")
     ax.legend()
 
     st.pyplot(fig)
@@ -104,7 +115,9 @@ elif menu == "Dashboard Produksi":
 
     waste_total = produksi["Waste"].sum()
 
-    st.warning(f"Total Waste Produksi: {waste_total} pcs")
+    st.warning(
+        f"Total Waste Produksi: {waste_total:.1f} Kg"
+    )
 
 # =========================
 # DASHBOARD LIMBAH
@@ -117,19 +130,21 @@ elif menu == "Dashboard Limbah":
 
     st.subheader("Pendapatan Limbah")
 
-    fig2, ax2 = plt.subplots(figsize=(10,5))
+    fig2, ax2 = plt.subplots(figsize=(10, 5))
 
     ax2.bar(
-        limbah["Tanggal"],
+        limbah["Hari"],
         limbah["Pendapatan_Limbah"]
     )
 
-    ax2.set_xlabel("Tanggal")
+    ax2.set_xlabel("Hari")
     ax2.set_ylabel("Pendapatan")
 
     st.pyplot(fig2)
 
-    total_profit_limbah = limbah["Pendapatan_Limbah"].sum()
+    total_profit_limbah = (
+        limbah["Pendapatan_Limbah"].sum()
+    )
 
     st.success(
         f"Total Pendapatan Limbah: Rp {total_profit_limbah:,.0f}"
@@ -151,9 +166,11 @@ elif menu == "Sustainability":
     )
 
     st.info(
-        "Digitalisasi data produksi dan limbah membantu UMKM "
-        "mengambil keputusan berbasis data untuk meningkatkan "
-        "efisiensi operasional."
+        """
+        Digitalisasi data produksi dan limbah membantu UMKM
+        mengambil keputusan berbasis data untuk meningkatkan
+        efisiensi operasional.
+        """
     )
 
     st.markdown("---")
