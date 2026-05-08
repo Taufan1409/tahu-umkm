@@ -22,39 +22,34 @@ limbah = pd.read_csv("data_limbah.csv")
 # =========================
 produksi["Waste"] = produksi["Produksi_kg"] * 0.1
 
-limbah["Pendapatan_Limbah"] = (
-    limbah["Ampas_kg"] * 2000
-)
-
-limbah["Sisa_Limbah"] = (
-    limbah["Ampas_kg"] * 0.2
-)
+limbah["Pendapatan_Limbah"] = limbah["Ampas_kg"] * 2000
+limbah["Sisa_Limbah"] = limbah["Ampas_kg"] * 0.2
 
 # =========================
-# SIDEBAR
+# SIDEBAR MENU (URUTAN BARU)
 # =========================
-st.sidebar.title("Menu")
+st.sidebar.title("📌 Menu")
 
 menu = st.sidebar.radio(
     "Pilih Halaman",
     [
         "Beranda",
+        "Tentang Kami",
         "Dashboard Produksi",
         "Dashboard Limbah",
-        "Sustainability"
+        "Sustainability",
+        "Kontak Kami"
     ]
 )
 
 # =========================
-# HALAMAN BERANDA
+# 1. BERANDA
 # =========================
 if menu == "Beranda":
 
     st.title("🟨 UMKM Tahu Sumedang")
 
-    st.subheader(
-        "Cita Rasa Tradisional dengan Sentuhan Modern"
-    )
+    st.subheader("Cita Rasa Tradisional dengan Sentuhan Modern")
 
     st.write(
         """
@@ -66,27 +61,35 @@ if menu == "Beranda":
 
     col1, col2, col3 = st.columns(3)
 
-    total_produksi = produksi["Produksi_kg"].sum()
-    total_waste = produksi["Waste"].sum()
-    total_limbah = limbah["Pendapatan_Limbah"].sum()
+    col1.metric("Total Produksi", f"{produksi['Produksi_kg'].sum()} Kg")
+    col2.metric("Total Waste", f"{produksi['Waste'].sum():.1f} Kg")
+    col3.metric("Profit Limbah", f"Rp {limbah['Pendapatan_Limbah'].sum():,.0f}")
 
-    col1.metric(
-        "Total Produksi",
-        f"{total_produksi} Kg"
-    )
+# =========================
+# 2. TENTANG KAMI
+# =========================
+elif menu == "Tentang Kami":
 
-    col2.metric(
-        "Total Waste",
-        f"{total_waste:.1f} Kg"
-    )
+    st.title("🏪 Tentang Kami")
 
-    col3.metric(
-        "Profit Limbah",
-        f"Rp {total_limbah:,.0f}"
+    st.write(
+        """
+        Berawal dari usaha rumahan, kami menghadirkan Tahu Sumedang
+        dengan cita rasa khas yang dipadukan dengan pendekatan modern
+        dalam pemasaran dan pengelolaan usaha.
+
+        Kami percaya bahwa UMKM tradisional juga mampu berkembang
+        melalui transformasi digital, inovasi produk, dan pelayanan
+        yang lebih baik kepada pelanggan.
+
+        Dengan komitmen terhadap kualitas, kebersihan, dan
+        keberlanjutan, kami terus berupaya menghadirkan produk
+        terbaik untuk masyarakat.
+        """
     )
 
 # =========================
-# DASHBOARD PRODUKSI
+# 3. DASHBOARD PRODUKSI
 # =========================
 elif menu == "Dashboard Produksi":
 
@@ -94,33 +97,20 @@ elif menu == "Dashboard Produksi":
 
     st.dataframe(produksi)
 
-    st.subheader("Grafik Produksi")
+    fig, ax = plt.subplots()
 
-    fig, ax = plt.subplots(figsize=(10, 5))
-
-    ax.plot(
-        produksi["Hari"],
-        produksi["Produksi_kg"],
-        marker='o',
-        label='Produksi'
-    )
-
+    ax.plot(produksi["Hari"], produksi["Produksi_kg"], marker='o', label="Produksi")
+    ax.set_title("Produksi Tahu")
     ax.set_xlabel("Hari")
-    ax.set_ylabel("Produksi (Kg)")
+    ax.set_ylabel("Kg")
     ax.legend()
 
     st.pyplot(fig)
 
-    st.subheader("Analisis Waste")
-
-    waste_total = produksi["Waste"].sum()
-
-    st.warning(
-        f"Total Waste Produksi: {waste_total:.1f} Kg"
-    )
+    st.warning(f"Total Waste: {produksi['Waste'].sum():.1f} Kg")
 
 # =========================
-# DASHBOARD LIMBAH
+# 4. DASHBOARD LIMBAH
 # =========================
 elif menu == "Dashboard Limbah":
 
@@ -128,30 +118,17 @@ elif menu == "Dashboard Limbah":
 
     st.dataframe(limbah)
 
-    st.subheader("Pendapatan Limbah")
+    fig2, ax2 = plt.subplots()
 
-    fig2, ax2 = plt.subplots(figsize=(10, 5))
-
-    ax2.bar(
-        limbah["Hari"],
-        limbah["Pendapatan_Limbah"]
-    )
-
-    ax2.set_xlabel("Hari")
-    ax2.set_ylabel("Pendapatan")
+    ax2.bar(limbah["Hari"], limbah["Pendapatan_Limbah"])
+    ax2.set_title("Pendapatan Limbah")
 
     st.pyplot(fig2)
 
-    total_profit_limbah = (
-        limbah["Pendapatan_Limbah"].sum()
-    )
-
-    st.success(
-        f"Total Pendapatan Limbah: Rp {total_profit_limbah:,.0f}"
-    )
+    st.success(f"Total Pendapatan: Rp {limbah['Pendapatan_Limbah'].sum():,.0f}")
 
 # =========================
-# HALAMAN SUSTAINABILITY
+# 5. SUSTAINABILITY
 # =========================
 elif menu == "Sustainability":
 
@@ -159,34 +136,39 @@ elif menu == "Sustainability":
 
     st.write(
         """
-        Limbah ampas tahu dimanfaatkan sebagai pakan ternak
-        untuk mengurangi waste produksi sekaligus menciptakan
-        nilai ekonomi tambahan bagi UMKM.
+        Kami percaya bahwa usaha yang baik tidak hanya menghasilkan
+        keuntungan, tetapi juga memperhatikan lingkungan.
+
+        Limbah ampas tahu kami manfaatkan kembali menjadi produk
+        bernilai tambah seperti pakan ternak dan inovasi makanan
+        berbasis serat.
+
+        Melalui pengelolaan limbah yang lebih baik, kami berupaya
+        mengurangi waste produksi dan menciptakan usaha yang lebih
+        berkelanjutan.
         """
     )
 
     st.info(
+        "Digitalisasi membantu UMKM mengambil keputusan lebih efisien dan berkelanjutan."
+    )
+
+# =========================
+# 6. KONTAK KAMI
+# =========================
+elif menu == "Kontak Kami":
+
+    st.title("📞 Kontak Kami")
+
+    st.write(
         """
-        Digitalisasi data produksi dan limbah membantu UMKM
-        mengambil keputusan berbasis data untuk meningkatkan
-        efisiensi operasional.
+        Kami siap melayani pemesanan, kerja sama, maupun pertanyaan
+        seputar produk kami.
         """
     )
 
-    st.markdown("---")
+    st.markdown("### 📱 WhatsApp")
+    st.write("0812-3456-7890")
 
-    st.subheader("Alur Pengelolaan Limbah")
-
-    st.code(
-        """
-Produksi Tahu
-      ↓
-Ampas Tahu
-      ↓
-Pencatatan Digital
-      ↓
-Distribusi Pakan Ternak
-      ↓
-Profit Tambahan
-        """
-    )
+    st.markdown("### 📧 Email")
+    st.write("umkmtahusumedang@gmail.com")
