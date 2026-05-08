@@ -23,11 +23,11 @@ limbah = pd.read_csv("data_limbah.csv")
 produksi["Waste"] = produksi["Produksi_kg"] * 0.1
 
 limbah["Pendapatan_Limbah"] = (
-    limbah["Dijual_kg"] * limbah["Harga_kg"]
+    limbah["Ampas_kg"] * 2000
 )
 
 limbah["Sisa_Limbah"] = (
-    limbah["Ampas_kg"] - limbah["Dijual_kg"]
+    limbah["Ampas_kg"] * 0.2
 )
 
 # =========================
